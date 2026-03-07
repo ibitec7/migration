@@ -21,7 +21,13 @@ cd migration
 
 ### 2. Install dependencies
 
-> **Recommended: uv**
+> **Recommended: Dev Containers**
+
+[Dev Containers](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers) extension on VS Code lets you use a Docker container as a full-featured development environment. It helps with compatibility between different OS and environments. Install the Dev Containers extension for VS Code.
+
+Open the project in VS Code, then open the Command Palette with `Ctrl+Shift+P` (Windows/Linux) or `Cmd+Shift+P` (Mac) and run the **Dev Containers: Reopen in Container** command. VS Code will build the container and reload the project inside it.
+
+> **Running Locally: uv**
 
 [uv](https://docs.astral.sh/uv/) is a fast Python package and project manager. If you don't have it installed, follow the [uv installation guide](https://docs.astral.sh/uv/getting-started/installation/).
 
@@ -50,6 +56,9 @@ pip install -r requirements.txt
 pip install -e .
 ```
 
+### 3. Get started with development
+
+1. Install the devcontainers extension on VS Code 
 
 
 ## Project Structure
