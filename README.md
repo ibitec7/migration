@@ -1,12 +1,12 @@
 # Migration Prediction Analysis
 
-A data-driven project that analyzes historical migration data and predicts future migration trends using machine learning techniques.
+A data-driven project that analyzes historical migration data and predicts future migration surges using machine learning techniques.
 
 
 
 ## Overview
 
-This project investigates human migration patterns by studying push and pull factors that influence people's decisions to move between countries. By leveraging historical migration data and real-time interest indicators, the goal is to build predictive models that can forecast future migration trends — valuable for policy makers, city planners, and public health officials.
+This project investigates human migration patterns by studying push and pull factors that influence people's decisions to move between countries. By leveraging historical migration data and real-time interest indicators, the goal is to build predictive models that can forecast future migration surges — valuable for policy makers, city planners, and public health officials to anticipate a surge in immigrant in advance to prepare.
 
 
 
@@ -107,7 +107,7 @@ migration/
 ### Models Used
 | Model               | Purpose                                               |
 | ------------------- | ----------------------------------------------------- |
-|   Model1            |  Predicting sentiment                                 |
+|   BERT              |  Analyzing the sentiment of news                      |
 |   Model2            |  Predicting migration surges                          |
 
 
@@ -119,7 +119,9 @@ migration/
 | [Travel.State.Gov](https://travel.state.gov)                       | Government | Ground truth — legal immigrants         |
 | [US Customs and Border Protection](https://www.cbp.gov)            | Government | Ground truth — illegal border crossings |
 | [IMF Financial Data](https://www.imf.org/en/Data)                  | Financial  | Push & pull economic factors            |
-| [Google Trends (via Pytrends)](https://pypi.org/project/pytrends/) | API        | Real-time migration interest tracking   |
+| [Google Trends (via pytrends)](https://pypi.org/project/pytrends/) | API        | Real-time migration interest tracking   |
+| [Google News (via pygooglenews)](https://pypi.org/project/pygooglenews/) | API        | News sentiment analysis   |
+| [ETL on Yahoo Finance (via indicators-cli ETL tool)](https://pypi.org/project/indicators-cli/) | ETL        | Financial health and indicators    |
 
 
 
@@ -137,6 +139,8 @@ requires-python = ">=3.12"
 | `pandas`         | Data manipulation and analysis        |
 | `polars`         | High-performance DataFrame operations |
 | `pytrends`       | Google Trends API integration         |
+| `pygooglenews`   | Google News API integration           |
 | `scikit-learn`   | Machine learning models               |
+| `indicators-cli` | ETL for financial indicators via CLI  |
 
 ---
