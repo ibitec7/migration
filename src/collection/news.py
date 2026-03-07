@@ -8,6 +8,7 @@ import logging
 import time
 from urllib.parse import quote, urlparse
 import json
+import trafilatura
 
 import argparse
 from tqdm import tqdm
@@ -46,7 +47,6 @@ async def decode(encoded_urls):
         tasks = [get_decoding_params(urlparse(url).path.split("/")[-1], client) for url in encoded_urls]
         articles_params = await atqdm.gather(*tasks, desc="Fetching decoding params")
         decoded_urls = await decode_urls(articles_params, client)
-        print(decoded_urls)
         return decoded_urls
 
 def decode_async(urls):
@@ -118,10 +118,10 @@ async def _fetch_page(
             await page.goto(url, wait_until="domcontentloaded", timeout=30_000)
             html = await page.content()
             logging.debug(f"Playwright scraped {url}")
-            return (i, BeautifulSoup(html, "html.parser"))
+            return (i, trafilatura.extract(html, output_format="markdown", include_formatting=True, include_tables=True, with_metadata=True))
         except Exception as e:
             logging.error(f"Playwright error scraping {url}: {e}")
-            return (i, BeautifulSoup("", "html.parser"))
+            return (i, trafilatura.extract(""))
         finally:
             await page.close()
 
@@ -235,19 +235,23 @@ def main(queries: list, from_date: str, to_date: str, limit: int, output_path: s
         try:
             if hasattr(response[1], 'error_type'):
                 logging.warning(f"Skipping article at index {i} due to error: {response[1].error_type}: {response[1].error_msg}")
+                data["articles"][i]["status_code"] = response[1].status_code
                 data["articles"][i]["response"] = f"Error fetching content: {response[1].error_msg}"
                 continue
                 
             if response[1].status_code == 200:
-                soup = BeautifulSoup(response[1].content, "html.parser")
-                data["articles"][i]["response"] = soup.text
+                data["articles"][i]["status_code"] = response[1].status_code
+                article = trafilatura.extract(response[1].content, output_format="markdown", include_formatting=True, include_tables=True, with_metadata=True)
+                data["articles"][i]["response"] = article
             elif response[1].status_code == 429:
                 bad_urls.append((i, str(response[1].url)))
             else:
                 logging.warning(f"Skipping article at index {i} due to status code {response[1].status_code}")
+                data["articles"][i]["status_code"] = response[1].status_code
                 data["articles"][i]["response"] = f"Error fetching content: HTTP {response[1].status_code}"
         except Exception as e:
             logging.error(f"Error processing response for index {i}: {str(e)}")
+            data["articles"][i]["status_code"] = response[1].status_code
             data["articles"][i]["response"] = f"Error processing content: {str(e)}"
 
     if len(bad_urls) == 0:
@@ -255,12 +259,14 @@ def main(queries: list, from_date: str, to_date: str, limit: int, output_path: s
     else:
         logging.info(f"{len(bad_urls)} bad URLs found — scraping with Playwright")
 
-        soups = scrape_playwright(bad_urls)
+        articles = scrape_playwright(bad_urls)
 
-        for i, soup in tqdm(soups, desc="Processing Playwright results"):
-            data["articles"][i]["response"] = soup.text if soup else ""
+        for i, article in tqdm(articles, desc="Processing Playwright results"):
+            data["articles"][i]["response"] = article if article else ""
 
     logging.info("Saving the json file now")
+
+    assert data is not None
 
     with open(output_path, "w") as file:
         json.dump(data, file, indent=4)
