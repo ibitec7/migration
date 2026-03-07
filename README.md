@@ -15,7 +15,7 @@ This project investigates human migration patterns by studying push and pull fac
 ### 1. Clone the repository
 
 ```bash
-git clone https://github.com/your-username/migration.git
+git clone https://github.com/ibitec7/migration.git
 cd migration
 ```
 
