@@ -4,8 +4,6 @@ import asyncio
 from bs4 import BeautifulSoup
 from pygooglenews import GoogleNews
 import os
-import logging
-import time
 from urllib.parse import quote, urlparse
 import json
 import trafilatura
@@ -14,16 +12,30 @@ import argparse
 from tqdm import tqdm
 from tqdm.asyncio import tqdm as atqdm
 
+from utils import setup_logger
+
 OUTPUT_PATH = "/home/ibrahim/stock/data/historical.json"
 
 async def get_decoding_params(gn_art_id, client):
-    response = await client.get(f"https://news.google.com/rss/articles/{gn_art_id}", follow_redirects=True)
+    response = await client.get(
+        f"https://news.google.com/rss/articles/{gn_art_id}",
+        follow_redirects=True
+    )
     response.raise_for_status()
-    soup = BeautifulSoup(response, "lxml")
+
+    soup = BeautifulSoup(response.text, "lxml")
     div = soup.select_one("c-wiz > div")
+    if div is None:
+        raise ValueError(f"Could not find decoding params for article id: {gn_art_id}")
+
+    signature = div.get("data-n-a-sg")
+    timestamp = div.get("data-n-a-ts")
+    if not signature or not timestamp:
+        raise ValueError(f"Missing signature/timestamp for article id: {gn_art_id}")
+
     return {
-        "signature": div.get("data-n-a-sg"),
-        "timestamp": div.get("data-n-a-ts"),
+        "signature": signature,
+        "timestamp": timestamp,
         "gn_art_id": gn_art_id,
     }
 
@@ -36,15 +48,34 @@ async def decode_urls(articles, client):
         for art in articles
     ]
     payload = f"f.req={quote(json.dumps([articles_reqs]))}"
-    headers = {"content-type": "application/x-www-form-urlencoded;charset=UTF-8", "User-Agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:109.0) Gecko/20100101 Firefox/115.0"}
-    response = await client.post("https://news.google.com/_/DotsSplashUi/data/batchexecute", headers=headers, data=payload)
-    time.sleep(5)
+    headers = {
+        "content-type": "application/x-www-form-urlencoded;charset=UTF-8",
+        "User-Agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:109.0) Gecko/20100101 Firefox/115.0",
+    }
+
+    response = await client.post(
+        "https://news.google.com/_/DotsSplashUi/data/batchexecute",
+        headers=headers,
+        data=payload
+    )
     response.raise_for_status()
-    return [json.loads(res[2])[1] for res in json.loads(response.text.split("\n\n")[1])[:-2]]
+
+    # non-blocking pause (if needed to avoid throttling)
+    await asyncio.sleep(0.5)
+
+    body = response.text.split("\n\n")
+    if len(body) < 2:
+        raise ValueError("Unexpected batchexecute response format")
+
+    parsed = json.loads(body[1])
+    return [json.loads(res[2])[1] for res in parsed[:-2]]
 
 async def decode(encoded_urls):
-    async with httpx.AsyncClient() as client:
-        tasks = [get_decoding_params(urlparse(url).path.split("/")[-1], client) for url in encoded_urls]
+    async with httpx.AsyncClient(timeout=30.0) as client:
+        tasks = [
+            get_decoding_params(urlparse(url).path.split("/")[-1], client)
+            for url in encoded_urls
+        ]
         articles_params = await atqdm.gather(*tasks, desc="Fetching decoding params")
         decoded_urls = await decode_urls(articles_params, client)
         return decoded_urls
@@ -57,7 +88,7 @@ async def get_response(client: httpx.AsyncClient, url: tuple):
         response = await client.get(url[1])
 
         if response.status_code == 200:
-            logging.debug(f"Fetched {url[1]} successfully!")
+            logger.debug(f"Fetched {url[1]} successfully!")
         elif response.status_code == 302:
             try:
                 location = response.headers.get("location", "")
@@ -67,26 +98,26 @@ async def get_response(client: httpx.AsyncClient, url: tuple):
                     base_url = f"{parsed_url.scheme}://{parsed_url.netloc}"
                     location = f"{base_url}{location}"
                     
-                logging.debug(f"Following redirect from {url[1]} to {location}")
+                logger.debug(f"Following redirect from {url[1]} to {location}")
                 
                 redirect_response = await client.get(location)
                 if redirect_response.status_code == 200:
-                    logging.debug(f"Successfully followed redirect to {location}")
+                    logger.debug(f"Successfully followed redirect to {location}")
                     response = redirect_response
                 else:
-                    logging.warning(f"Redirect to {location} failed with status {redirect_response.status_code}")
+                    logger.warning(f"Redirect to {location} failed with status {redirect_response.status_code}")
             except (ValueError, httpx.RequestError) as e:
-                logging.warning(f"Error following redirect from {url[1]}: {str(e)}")
+                logger.warning(f"Error following redirect from {url[1]}: {str(e)}")
         else:
-            logging.warning(f"Bad response from {url[1]} with status {response.status_code}")
+            logger.warning(f"Bad response from {url[1]} with status {response.status_code}")
     except httpx.RequestError as e:
-        logging.error(f"Request error for {url[1]}: {str(e)}")
+        logger.error(f"Request error for {url[1]}: {str(e)}")
 
         response = httpx.Response(status_code=0, request=httpx.Request("GET", url[1]))
         response.error_type = type(e).__name__
         response.error_msg = str(e)
     except Exception as e:
-        logging.error(f"Unexpected error processing {url[1]}: {str(e)}")
+        logger.error(f"Unexpected error processing {url[1]}: {str(e)}")
 
         response = httpx.Response(status_code=0, request=httpx.Request("GET", url[1]))
         response.error_type = type(e).__name__
@@ -100,9 +131,9 @@ def get_response_sync(client: httpx.Client, url: tuple):
     response_tuple = (url[0], response)
 
     if response.status_code == 200:
-        logging.debug(f"Fetched {url[1]} successfully!")
+        logger.debug(f"Fetched {url[1]} successfully!")
     else:
-        logging.warning(f"Bad response from {url[1]}")
+        logger.warning(f"Bad response from {url[1]}")
 
     return response_tuple
 
@@ -117,10 +148,10 @@ async def _fetch_page(
         try:
             await page.goto(url, wait_until="domcontentloaded", timeout=30_000)
             html = await page.content()
-            logging.debug(f"Playwright scraped {url}")
+            logger.debug(f"Playwright scraped {url}")
             return (i, trafilatura.extract(html, output_format="markdown", include_formatting=True, include_tables=True, with_metadata=True))
         except Exception as e:
-            logging.error(f"Playwright error scraping {url}: {e}")
+            logger.error(f"Playwright error scraping {url}: {e}")
             return (i, trafilatura.extract(""))
         finally:
             await page.close()
@@ -128,7 +159,7 @@ async def _fetch_page(
 
 async def scrape_playwright_async(urls: list, max_concurrent: int = 8) -> list:
     """Scrape a list of (index, url) tuples in parallel using Playwright."""
-    logging.info("Launching headless Playwright browser")
+    logger.info("Launching headless Playwright browser")
     async with async_playwright() as p:
         browser: Browser = await p.chromium.launch(
             headless=True,
@@ -146,7 +177,7 @@ async def scrape_playwright_async(urls: list, max_concurrent: int = 8) -> list:
         results = await atqdm.gather(*tasks, desc="Scraping pages")
         await context.close()
         await browser.close()
-    logging.info("Playwright scraping complete")
+    logger.info("Playwright scraping complete")
     return list(results)
 
 
@@ -155,22 +186,22 @@ def scrape_playwright(urls: list) -> list:
 
 async def fetch_urls(urls: list) -> list:
 
-    logging.info("Configuring async client")
+    logger.info("Configuring async client")
 
     async with httpx.AsyncClient() as client:
         tasks = [asyncio.create_task(get_response(client, url)) for url in urls]
 
-        logging.info("Created tasks now gathering them")
+        logger.info("Created tasks now gathering them")
         responses = await atqdm.gather(*tasks, desc="Fetching URLs")
 
     return responses
 
 def run_async(urls: list) -> list:
-    logging.info("Fetching URL responses through async client")
+    logger.info("Fetching URL responses through async client")
     return asyncio.run(fetch_urls(urls))
 
 def get_news(queries: list, date_from=None, date_to=None, limit: int = 50) -> dict:
-    logging.info("Fetching news from Google News API")
+    logger.info("Fetching news from Google News API")
 
     gn = GoogleNews()
 
@@ -187,54 +218,54 @@ def get_news(queries: list, date_from=None, date_to=None, limit: int = 50) -> di
             if news["title"] not in all_news["headlines"]:
                 all_news["articles"].append(news)
                 all_news["headlines"].append(news["title"])
+                if len(all_news["articles"]) >= limit:
+                    break
+        if len(all_news["articles"]) >= limit:
+            break
 
     encoded_urls = [article["link"] for article in all_news["articles"]]
     decoded_urls = decode_async(encoded_urls)
-    
+
     for i, article in enumerate(all_news["articles"]):
         article["link"] = decoded_urls[i]
-        
 
     all_news["totalResults"] = len(all_news["articles"])
-
     return all_news
 
 
 ### MAIN FUNCTION ###
 
 def main(queries: list, from_date: str, to_date: str, limit: int, output_path: str, log_path: str) -> int:
+
+    print(from_date, to_date)
     
-    logging.basicConfig(
-        filename=log_path,
-        filemode='a',
-        level=logging.INFO,
-        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
-    )
+    global logger
+    logger = setup_logger(log_path, write_console=False)
 
     if os.path.exists(output_path) == False:
         data = get_news(queries=queries, date_from=from_date, date_to=to_date, limit=limit)
     else:
-        logging.info("News file already exists. Moving to the next step")
+        logger.info("News file already exists. Moving to the next step")
         return 1
 
     if "Information" in data.keys():
-        logging.warning("No news found for the given date range")
+        logger.warning("No news found for the given date range")
         print(data)
         return -1
 
     urls = [(i,feed["link"]) for i, feed in enumerate(data["articles"])]
 
-    logging.info("fetching the news from the URLs")
+    logger.info("fetching the news from the URLs")
     responses = run_async(urls)
 
     bad_urls = []
 
-    logging.info("Fetching detailed news from URLs")
+    logger.info("Fetching detailed news from URLs")
 
     for i, response in tqdm(enumerate(responses), total=len(responses), desc="Processing responses"):
         try:
             if hasattr(response[1], 'error_type'):
-                logging.warning(f"Skipping article at index {i} due to error: {response[1].error_type}: {response[1].error_msg}")
+                logger.warning(f"Skipping article at index {i} due to error: {response[1].error_type}: {response[1].error_msg}")
                 data["articles"][i]["status_code"] = response[1].status_code
                 data["articles"][i]["response"] = f"Error fetching content: {response[1].error_msg}"
                 continue
@@ -246,43 +277,74 @@ def main(queries: list, from_date: str, to_date: str, limit: int, output_path: s
             elif response[1].status_code == 429:
                 bad_urls.append((i, str(response[1].url)))
             else:
-                logging.warning(f"Skipping article at index {i} due to status code {response[1].status_code}")
+                logger.warning(f"Skipping article at index {i} due to status code {response[1].status_code}")
                 data["articles"][i]["status_code"] = response[1].status_code
                 data["articles"][i]["response"] = f"Error fetching content: HTTP {response[1].status_code}"
         except Exception as e:
-            logging.error(f"Error processing response for index {i}: {str(e)}")
+            logger.error(f"Error processing response for index {i}: {str(e)}")
             data["articles"][i]["status_code"] = response[1].status_code
             data["articles"][i]["response"] = f"Error processing content: {str(e)}"
 
     if len(bad_urls) == 0:
-        logging.info("No bad URLs found")
+        logger.info("No bad URLs found")
     else:
-        logging.info(f"{len(bad_urls)} bad URLs found — scraping with Playwright")
+        logger.info(f"{len(bad_urls)} bad URLs found — scraping with Playwright")
 
         articles = scrape_playwright(bad_urls)
 
         for i, article in tqdm(articles, desc="Processing Playwright results"):
             data["articles"][i]["response"] = article if article else ""
 
-    logging.info("Saving the json file now")
+    logger.info("Saving the json file now")
 
     assert data is not None
 
     with open(output_path, "w") as file:
         json.dump(data, file, indent=4)
 
-    logging.info("Done saving the json file")
+    logger.info("Done saving the json file")
 
     return 1
 
 if __name__ == "__main__":
 
+    parser: argparse.ArgumentParser = argparse.ArgumentParser(description="A tool to scrape news articles from queries")
+
+    parser.add_argument(
+        "-q", "--query",
+        nargs="+",
+        type=str,
+        help="A list of queries to search the news articles"
+    )
+    parser.add_argument(
+        "-y", "--year",
+        nargs="+",
+        type=str,
+        help="A list of years to fetch the news articles for"
+    )
+    parser.add_argument(
+        "-m", "--month",
+        nargs="+",
+        type=str,
+        help="A list of months to fetch the news articles for"
+    )
+    parser.add_argument(
+        "-l", "--limit",
+        type=int,
+        default=50,
+        help="The maximum number of news articles to fetch"
+    )
+
+    args = parser.parse_args()
+
+    queries = args.query
+    years = args.year if args.year else []
+    months = args.month if args.month else []
+    lim = args.limit
+
+    months = ["0" + month if len(month) == 1 else month for month in months]
+
     os.makedirs("./logs", exist_ok=True)
-
-    queries = ["Immigrants in the US", "US Visas"]
-
-    years = ["2025"]
-    months = ["12"]
 
     root_path = "./data/raw/news"
     if os.path.exists(root_path) == False:
@@ -322,7 +384,7 @@ if __name__ == "__main__":
                 queries=queries,
                 from_date=start_date,
                 to_date=end_date,
-                limit=50,
+                limit=lim,
                 output_path=file_path,
                 log_path="./logs/news.log"
             )
