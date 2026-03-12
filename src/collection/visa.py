@@ -16,7 +16,7 @@ LOG_DIR: str = "./logs"
 os.makedirs(LOG_DIR, exist_ok=True)
 
 global logger
-logger = setup_logger(os.path.join(LOG_DIR, "visa_collection.log"), write_console=True)
+logger = setup_logger(os.path.join(LOG_DIR, "visa_collection.log"), write_console=False)
 
 os.makedirs(DATA_DIR, exist_ok=True)
 
@@ -34,8 +34,8 @@ async def main(base_url: str = "https://travel.state.gov"):
     a_tags = soup.find_all("a", href=True)
 
     excel_urls = [urljoin(base_url, tag["href"]) for tag in soup.find_all("a", string="(Excel)")]
-    pdf_urls = [urljoin(base_url, tag["href"]) for tag in a_tags if tag["href"].endswith(".pdf")]
-    file_prefixes = [tag.contents[0] for tag in a_tags if tag["href"].endswith(".pdf")]
+    pdf_urls = [urljoin(base_url, tag["href"]) for tag in a_tags if tag["href"].endswith(".pdf") and "by FSC" in tag.contents[0]]
+    file_prefixes = [tag.contents[0] for tag in a_tags if tag["href"].endswith(".pdf") and "by FSC" in tag.contents[0]]
 
     logger.info(f"Found {len(pdf_urls)} PDF URLs, {len(excel_urls)} Excel URLs, {len(file_prefixes)} file prefixes")
     
@@ -62,6 +62,16 @@ async def main(base_url: str = "https://travel.state.gov"):
         await atqdm.gather(*excel_tasks, desc="Downloading Excel files", unit="file")
 
     logger.info(f"Download completed. Excel files saved to {os.path.join(DATA_DIR, 'excel')}, PDF files saved to {os.path.join(DATA_DIR, 'pdf')}.")
+
+    try:
+        assert len(pdf_urls) == len(os.listdir(os.path.join(DATA_DIR, "pdf")))
+    except AssertionError:
+        print(f"[WARN] {len(pdf_urls) - len(os.listdir(os.path.join(DATA_DIR, "pdf")))} PDF files are not downloaded")
+    
+    try:
+        assert len(excel_urls) == len(os.listdir(os.path.join(DATA_DIR, "excel")))
+    except AssertionError:
+        print(f"[WARN] {len(excel_urls) - len(os.listdir(os.path.join(DATA_DIR, "excel")))} Excel files are not downloaded")
 
 if __name__ == "__main__":
     run(main())
