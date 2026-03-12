@@ -131,25 +131,3 @@ migration/
 | [Google Trends (via pytrends)](https://pypi.org/project/pytrends/) | API        | Real-time migration interest tracking   |
 | [Google News (via pygooglenews)](https://pypi.org/project/pygooglenews/) | API        | News sentiment analysis   |
 | [ETL on Yahoo Finance (via indicators-cli ETL tool)](https://pypi.org/project/indicators-cli/) | ETL        | Financial health and indicators    |
-
-
-
-## Dependencies
-
-```toml
-requires-python = ">=3.12"
-```
-
-| Package          | Purpose                               |
-| ---------------- | ------------------------------------- |
-| `beautifulsoup4` | Web scraping for data collection      |
-| `httpx`          | Async HTTP requests                   |
-| `numpy`          | Numerical computations                |
-| `pandas`         | Data manipulation and analysis        |
-| `polars`         | High-performance DataFrame operations |
-| `pytrends`       | Google Trends API integration         |
-| `pygooglenews`   | Google News API integration           |
-| `scikit-learn`   | Machine learning models               |
-| `indicators-cli` | ETL for financial indicators via CLI  |
-
----
