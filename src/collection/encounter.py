@@ -13,7 +13,7 @@ DATA_DIR: str = "./data/raw/encounter"
 os.makedirs(DATA_DIR, exist_ok=True)
 
 global logger
-logger = setup_logger(os.path.join("./logs", "encounter_collection.log"), write_console=True)
+logger = setup_logger(os.path.join("./logs", "encounter_collection.log"), write_console=False)
 
 async def main(base_url: str = "https://www.cbp.gov"):
     semaphore = asyncio.Semaphore(20)
