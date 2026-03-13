@@ -19,10 +19,17 @@ def scan_data(file_path: str) -> pl.LazyFrame:
         logger.info(f"Successfully read {file_path}")
 
         lf.with_columns(
-            pl.col("Months (abbv)").replace(MONTHS_MAP).alias("months_num")
+            pl.col("Fiscal Year").alias("year"),
+            pl.col("Months (abbv)").replace(MONTHS_MAP).alias("months_num"),
+            pl.col("Month Grouping").alias("month_grouping"),
+            pl.col("Component").alias("component"),
+            pl.col("Demographic").alias("demographic"),
+            pl.col("Citizenship Grouping").alias("citizenship_grouping"),
+            pl.col("Title of Authority").alias("title_of_authority"),
+            pl.col("Encounter Type").alias("encounter_type"),
+            pl.col("Encounter Count").alias("encounter_count")
         )
 
-        # lf.columns = 
         return lf
     except Exception as e:
         logger.error(f"Error reading {file_path}: {e}")
@@ -38,7 +45,7 @@ def merge_csv_files(data_dir: str) -> pl.DataFrame:
     
     logger.info(f"Found {len(csv_files)} CSV files to merge.")
     
-    lazy_frames = [scan_data(file) for file in csv_files]
+    lazy_frames: list[pl.LazyFrame] = [scan_data(file) for file in csv_files]
     
     if not lazy_frames:
         logger.warning("No valid data to merge after scanning.")
