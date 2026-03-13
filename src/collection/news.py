@@ -14,8 +14,6 @@ from tqdm.asyncio import tqdm as atqdm
 
 from utils import setup_logger
 
-OUTPUT_PATH = "/home/ibrahim/stock/data/historical.json"
-
 async def get_decoding_params(gn_art_id, client):
     response = await client.get(
         f"https://news.google.com/rss/articles/{gn_art_id}",
