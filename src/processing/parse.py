@@ -93,8 +93,8 @@ def parse_pdf_file_sync(pdf_path: str) -> pl.LazyFrame:
     
     return pl.concat(lazy_frames)
 
-def parse_pdf(data_dir: str = "/home/ibrahim/migration/data/raw/visa/pdf", file_path: str = "/home/ibrahim/migration/data/processed"):
-    file_path = "/home/ibrahim/migration/data/processed"
+def parse_pdf(data_dir: str = "./data/raw/visa/pdf", file_path: str = "./data/processed"):
+    file_path = "./data/processed"
     file_paths = [os.path.join(data_dir, f) for f in os.listdir(data_dir) if f.endswith(".pdf")]
     
     logger.info(f"Processing {len(file_paths)} PDF files with {OPTIMAL_PROCESS_COUNT} processes...\n")
