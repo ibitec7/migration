@@ -6,7 +6,7 @@ from concurrent.futures import ProcessPoolExecutor
 from tqdm import tqdm
 import fitz
 
-from utils import setup_logger, get_optimal_process_count, MONTHS_MAP
+from utils import setup_logger, get_optimal_process_count, MONTHS_MAP, VISA_MAP
 
 os.makedirs("./logs", exist_ok=True)
 
@@ -46,7 +46,7 @@ def parse_pdf_file_sync(pdf_path: str) -> pl.LazyFrame:
                                 break
                         
                         headers = table[header_idx]
-                        headers = [str(col).lower().strip() for col in headers if col]
+                        headers = [str(col).lower().strip().replace(" ", "_") for col in headers if col]
                         
                         if not headers:
                             continue
@@ -66,14 +66,16 @@ def parse_pdf_file_sync(pdf_path: str) -> pl.LazyFrame:
                                     pl.lit(month).alias("month"),
                                     pl.lit(year).alias("year"),
                                     pl.lit(MONTHS_MAP[month]).alias("month_num"),
-                                    pl.date(year=pl.lit(year), month=pl.lit(MONTHS_MAP[month]), day=pl.lit(1)).alias("date")
+                                    pl.date(year=pl.lit(year), month=pl.lit(MONTHS_MAP[month]), day=pl.lit(1)).alias("date"),
+                                    pl.col("visa_class").replace(VISA_MAP).alias("visa_type")
                                 ])
                                 .select([
                                     "date",
                                     "month_num",
                                     "month",
                                     "year",
-                                    *[col for col in headers if col not in ["month", "year", "month_num"]]
+                                    *[col for col in headers if col not in ["month", "year", "month_num"]],
+                                    "visa_type"
                                 ])
                                 .filter(pl.col("country").str.to_lowercase() != "grand total")
                                 .with_columns(
