@@ -1,20 +1,13 @@
 import logging
 import multiprocessing
+import json
 
-MONTHS_MAP = {
-        "JAN": 1,
-        "FEB": 2,
-        "MAR": 3,
-        "APR": 4,
-        "MAY": 5,
-        "JUN": 6,
-        "JUL": 7,
-        "AUG": 8,
-        "SEP": 9,
-        "OCT": 10,
-        "NOV": 11,
-        "DEC": 12
-    }
+MAPS = json.load(open("./src/processing/maps.json", "r"))
+
+MONTHS_MAP = MAPS["months_map"]
+VISA_MAP = MAPS["visa_map"]
+
+del MAPS
 
 def setup_logger(log_file, log_level=logging.INFO, write_console=True, write_file=True) -> logging.Logger:
     logger = logging.getLogger(__name__)
