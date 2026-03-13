@@ -6,21 +6,12 @@ from concurrent.futures import ProcessPoolExecutor
 from tqdm import tqdm
 import fitz
 
-from utils import setup_logger
+from utils import setup_logger, get_optimal_process_count, MONTHS_MAP
 
 os.makedirs("./logs", exist_ok=True)
 
 global logger
 logger = setup_logger(log_file="./logs/parse.log", write_console=False)
-
-def get_optimal_process_count() -> int:
-    """
-    Calculate optimal process count for CPU-bound PDF processing.
-    ProcessPoolExecutor uses true parallelism with multiprocessing (avoids GIL).
-    """
-    cpu_count = multiprocessing.cpu_count()
-    optimal_procs = max(2, cpu_count)
-    return optimal_procs
 
 OPTIMAL_PROCESS_COUNT = get_optimal_process_count()
 logger.info(f"CPU cores detected: {multiprocessing.cpu_count()}")
@@ -33,21 +24,6 @@ def parse_pdf_file_sync(pdf_path: str) -> pl.LazyFrame:
     file_split = file_name.split(" ")
     month = file_split[0][:3].upper()
     year = int(file_split[1])
-
-    months_map = {
-        "JAN": 1,
-        "FEB": 2,
-        "MAR": 3,
-        "APR": 4,
-        "MAY": 5,
-        "JUN": 6,
-        "JUL": 7,
-        "AUG": 8,
-        "SEP": 9,
-        "OCT": 10,
-        "NOV": 11,
-        "DEC": 12
-    }
     
     lazy_frames = []
     
@@ -85,13 +61,12 @@ def parse_pdf_file_sync(pdf_path: str) -> pl.LazyFrame:
                         
                         try:
                             lazy_df = (
-                                pl.DataFrame(data, schema=headers, orient="row")
-                                .lazy()
+                                pl.LazyFrame(data, schema=headers, orient="row")
                                 .with_columns([
                                     pl.lit(month).alias("month"),
                                     pl.lit(year).alias("year"),
-                                    pl.lit(months_map[month]).alias("month_num"),
-                                    pl.date(year=pl.lit(year), month=pl.lit(months_map[month]), day=pl.lit(1)).alias("date")
+                                    pl.lit(MONTHS_MAP[month]).alias("month_num"),
+                                    pl.date(year=pl.lit(year), month=pl.lit(MONTHS_MAP[month]), day=pl.lit(1)).alias("date")
                                 ])
                                 .select([
                                     "date",
@@ -127,7 +102,7 @@ def parse_pdf(data_dir: str = "/home/ibrahim/migration/data/raw/visa/pdf", file_
     with ProcessPoolExecutor(max_workers=OPTIMAL_PROCESS_COUNT) as executor:
         all_data = list(tqdm(executor.map(parse_pdf_file_sync, file_paths), total=len(file_paths), desc="Processing PDFs", unit="file"))
     
-    all_data = [df for df in all_data if df.collect().shape[0] > 0]
+    all_data = [df for df in all_data]
     
     if all_data:
         master: pl.DataFrame = pl.concat(all_data).sort("date").collect()
