@@ -56,7 +56,30 @@ pip install -r requirements.txt
 pip install -e .
 ```
 
-### 3. Get started with development
+### 3. Prepare data
+
+The `run.sh` script prepares and processes the data required for the project. Run it after installing dependencies:
+
+> **Linux/macOS**
+
+```bash
+# Add execute permissions to the script
+chmod +x run.sh
+
+# Run the script
+./run.sh
+```
+
+> **Windows (PowerShell)**
+
+```powershell
+# Run the script directly (no need to add permissions on Windows)
+.\run.sh
+```
+
+Note: On Windows, if you're using Command Prompt instead of PowerShell, you may need to use `bash run.sh` if you have Git Bash or WSL installed.
+
+### 4. Get started with development
 
 1. Install the devcontainers extension on VS Code 
 
@@ -66,28 +89,54 @@ pip install -e .
 ```
 migration/
 ├── data/
-│   ├── raw/          # Raw, unmodified datasets as downloaded from sources
-│   └── processed/    # Cleaned, transformed, and feature-engineered data
-├── notebooks/        # Jupyter notebooks for exploratory data analysis (EDA)
+│   ├── raw/                    # Raw, unmodified datasets as downloaded from sources
+│   │   ├── encounter/          # US-Mexico border crossing data
+│   │   ├── news/               # News articles organized by year
+│   │   │   ├── 2024/
+│   │   │   ├── 2025/
+│   │   │   └── 2026/
+│   │   └── visa/               # Immigration visa data
+│   │       ├── excel/
+│   │       └── pdf/
+│   └── processed/              # Cleaned, transformed, and feature-engineered data
+├── logs/                       # Application logs and processing logs
+├── notebooks/                  # Jupyter notebooks for exploratory data analysis (EDA)
 ├── src/
-│   ├── collection/   # Scripts for scraping and fetching data from external sources
-│   ├── processing/   # Data cleaning, transformation, and feature engineering pipelines
-│   └── models/       # ML model definitions, training scripts, and evaluation utilities
-├── pyproject.toml    # Project metadata and dependency definitions (managed by uv)
-├── requirements.txt  # Pip-compatible dependency list (coming soon)
-└── README.md         # Project documentation
+│   ├── main.py                 # Main entry point for the application
+│   ├── analysis/               # Data analysis scripts and utilities
+│   ├── collection/             # Scripts for scraping and fetching data from external sources
+│   │   ├── encounter.py        # CBP border encounter data collection
+│   │   ├── news.py             # Google News data collection
+│   │   ├── visa.py             # Visa data collection
+│   │   └── utils.py            # Collection utility functions
+│   ├── processing/             # Data cleaning, transformation, and feature engineering pipelines
+│   │   ├── merge.py            # Data merging and consolidation
+│   │   ├── parse.py            # Data parsing and validation
+│   │   └── utils.py            # Processing utility functions
+│   └── models/                 # ML model definitions, training scripts, and evaluation utilities
+├── pyproject.toml              # Project metadata and dependency definitions (managed by uv)
+├── requirements.txt            # Pip-compatible dependency list
+├── run.sh                       # Data preparation and processing script
+└── README.md                    # Project documentation
 ```
 
 | Path | Description |
 | -------------------------------- | --------------------------------------------------------------------------- |
 | `data/raw/` | Original datasets downloaded from government, financial, and API sources. Never modified directly. |
+| `data/raw/encounter/` | Southwest US-Mexico border encounter datasets from US Customs and Border Protection. |
+| `data/raw/news/` | News articles collected from Google News API, organized by year and month. |
+| `data/raw/visa/` | Immigration visa data in Excel and PDF formats. |
 | `data/processed/` | Cleaned and enriched datasets ready for model training and analysis. |
+| `logs/` | Application logs, processing logs, and debug output. |
 | `notebooks/` | Interactive Jupyter notebooks used for exploration, visualisation, and prototyping. |
+| `src/main.py` | Main entry point for running the entire pipeline. |
+| `src/analysis/` | Data analysis and visualization scripts. |
 | `src/collection/` | Data collection scripts — web scrapers, API clients (Google Trends, IMF, CBP, Travel.State.Gov). |
 | `src/processing/` | Feature engineering and preprocessing pipelines that transform raw data into model-ready inputs. |
 | `src/models/` | Model training, hyperparameter tuning, evaluation, and serialisation logic. |
 | `pyproject.toml` | Defines project metadata, Python version requirements, and all package dependencies. |
-| `requirements.txt` | Flat dependency list for pip users (to be generated from `pyproject.toml`). |
+| `requirements.txt` | Pip-compatible dependency list for pip users. |
+| `run.sh` | Bash script to automate data preparation and processing. |
 | `README.md` | This file — project overview, setup instructions, and documentation. |
 
 
