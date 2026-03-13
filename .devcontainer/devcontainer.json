@@ -10,7 +10,7 @@
 			"version": "latest"
 		}
 	},
-	"postCreateCommand": "uv sync"
+	"postCreateCommand": "uv sync && chmod +x run.sh && bash run.sh"
 
 	// Features to add to the dev container. More info: https://containers.dev/features.
 	// "features": {},
