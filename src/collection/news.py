@@ -12,7 +12,7 @@ import argparse
 from tqdm import tqdm
 from tqdm.asyncio import tqdm as atqdm
 
-from utils import setup_logger
+from utils import setup_logger, retry_errors
 
 async def get_decoding_params(gn_art_id, client):
     response = await client.get(
@@ -81,46 +81,9 @@ async def decode(encoded_urls):
 def decode_async(urls):
     return asyncio.run(decode(urls))
 
+@retry_errors(max_retries=3, backoff_factors=[1,1,1])
 async def get_response(client: httpx.AsyncClient, url: tuple):
-    try:
-        response = await client.get(url[1])
-
-        if response.status_code == 200:
-            logger.debug(f"Fetched {url[1]} successfully!")
-        elif response.status_code == 302:
-            try:
-                location = response.headers.get("location", "")
-                
-                if location.startswith('/'):
-                    parsed_url = urlparse(str(url[1]))
-                    base_url = f"{parsed_url.scheme}://{parsed_url.netloc}"
-                    location = f"{base_url}{location}"
-                    
-                logger.debug(f"Following redirect from {url[1]} to {location}")
-                
-                redirect_response = await client.get(location)
-                if redirect_response.status_code == 200:
-                    logger.debug(f"Successfully followed redirect to {location}")
-                    response = redirect_response
-                else:
-                    logger.warning(f"Redirect to {location} failed with status {redirect_response.status_code}")
-            except (ValueError, httpx.RequestError) as e:
-                logger.warning(f"Error following redirect from {url[1]}: {str(e)}")
-        else:
-            logger.warning(f"Bad response from {url[1]} with status {response.status_code}")
-    except httpx.RequestError as e:
-        logger.error(f"Request error for {url[1]}: {str(e)}")
-
-        response = httpx.Response(status_code=0, request=httpx.Request("GET", url[1]))
-        response.error_type = type(e).__name__
-        response.error_msg = str(e)
-    except Exception as e:
-        logger.error(f"Unexpected error processing {url[1]}: {str(e)}")
-
-        response = httpx.Response(status_code=0, request=httpx.Request("GET", url[1]))
-        response.error_type = type(e).__name__
-        response.error_msg = str(e)
-        
+    response = await client.get(url[1])
     response_tuple = (url[0], response)
     return response_tuple
 
