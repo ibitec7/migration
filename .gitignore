@@ -13,3 +13,6 @@ wheels/
 logs/*
 data/raw/*
 data/processed/*
+
+# Models
+src/models/tensor-rt/*
