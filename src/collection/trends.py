@@ -8,7 +8,6 @@ This script downloads the entire trends dataset from the Hugging Face repository
 and saves it to data/trends/ when run from the project root.
 """
 
-import os
 import sys
 from pathlib import Path
 from huggingface_hub import snapshot_download
