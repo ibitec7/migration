@@ -3,16 +3,24 @@ import logging
 import os
 import aiofiles
 import httpx
+import random
 
 from functools import wraps
 from typing import Callable, Any
 
-RETRYABLE_STATUS_CODES: set[int] = {302, 408, 429, 500, 502, 503, 504}
+# Status codes that should be retried with exponential backoff
+# Removed 302 (redirects) - httpx handles those automatically
+RETRYABLE_STATUS_CODES: set[int] = {408, 429, 500, 502, 503, 504}
 NON_RETRYABLE_STATUS_CODES: set[int] = {400, 401, 403, 404, 405, 406, 410, 413, 414, 415, 422, 451, 501}
 
 def setup_logger(log_file, log_level=logging.INFO, write_console=True, write_file=True) -> logging.Logger:
-    logger = logging.getLogger(__name__)
+    logger_name = f"{__name__}.{os.path.abspath(log_file)}"
+    logger = logging.getLogger(logger_name)
     logger.setLevel(log_level)
+    logger.propagate = False
+
+    if logger.handlers:
+        logger.handlers.clear()
 
     formatter = logging.Formatter('[%(levelname)s] %(asctime)s - %(message)s')
 
@@ -31,10 +39,12 @@ def setup_logger(log_file, log_level=logging.INFO, write_console=True, write_fil
 def retry_errors(
     max_retries: int = 3,
     backoff_factors: list = None,
-    logger: logging.Logger = None
+    logger: logging.Logger = None,
+    jitter: float = 2.0,
+    retry_after_cap: int = 10,
 ) -> Callable:
     if backoff_factors is None:
-        backoff_factors = [1, 2, 4]
+        backoff_factors = [2, 5, 10]
     if logger is None:
         logger = logging.getLogger(__name__)
     
@@ -82,14 +92,18 @@ def retry_errors(
                         retry_after = resp.headers.get("Retry-After")
                         if retry_after:
                             try:
-                                wait_time = int(retry_after)
+                                wait_time = min(int(retry_after), retry_after_cap)
                             except ValueError:
                                 wait_time = backoff_factors[attempt] if attempt < len(backoff_factors) else backoff_factors[-1]
                         else:
                             wait_time = backoff_factors[attempt] if attempt < len(backoff_factors) else backoff_factors[-1]
+                        
+                        # Add jitter to prevent thundering herd
+                        wait_time += random.uniform(0, jitter)
+                        
                         logger.warning(
                             f"Retryable error from {url_string}: HTTP {status_code}. "
-                            f"Attempt {attempt + 1}/{max_retries}. Retrying in {wait_time}s..."
+                            f"Attempt {attempt + 1}/{max_retries}. Retrying in {wait_time:.2f}s..."
                         )
                         await asyncio.sleep(wait_time)
                         continue
@@ -103,9 +117,11 @@ def retry_errors(
                     last_exception = e
                     if attempt < max_retries - 1:
                         wait_time = backoff_factors[attempt] if attempt < len(backoff_factors) else backoff_factors[-1]
+                        # Add jitter to prevent thundering herd
+                        wait_time += random.uniform(0, jitter)
                         logger.warning(
                             f"Network error for {url_string} (attempt {attempt + 1}/{max_retries}): {type(e).__name__}. "
-                            f"Retrying in {wait_time}s..."
+                            f"Retrying in {wait_time:.2f}s..."
                         )
                         await asyncio.sleep(wait_time)
                     else:
