@@ -512,9 +512,10 @@ def main(
     """
     logger.info(f"Starting news download for {from_date} to {to_date}")
     
-    # Overwrite mode: always refresh month file to ensure consistent output
+    # Skip mode: avoid re-downloading if month file already exists
     if os.path.exists(output_path):
-        logger.info(f"Overwriting existing news file at {output_path}")
+        logger.info(f"File {output_path} already exists. Skipping download.")
+        return 2
 
     # Fetch news from Google News
     start_time = time.time()
@@ -839,7 +840,7 @@ def main_cli():
             
             root_logger.info(f"Batch processing complete for '{query}'. Results:")
             for month_key, status in sorted(results.items()):
-                status_str = "✓ Success" if status == 1 else ("⊘ No news" if status == -1 else "✗ Failed")
+                status_str = "✓ Success" if status == 1 else ("⊘ No news" if status == -1 else ("⏭ Skipped" if status == 2 else "✗ Failed"))
                 root_logger.info(f"  {month_key}: {status_str}")
         else:
             # Fall back to serial processing for single year
