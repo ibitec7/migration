@@ -10,7 +10,7 @@
 			"version": "latest"
 		}
 	},
-	"postCreateCommand": "uv sync && chmod +x run.sh && bash run.sh"
+	"postCreateCommand": "uv sync --locked && chmod +x run.sh download_trends.sh"
 
 	// Features to add to the dev container. More info: https://containers.dev/features.
 	// "features": {},
