@@ -29,6 +29,7 @@ DEFAULT_UPLOAD_TARGETS = {
 DEFAULT_MODELS = {
     "flan-t5-tensorrt-int8_wo-engine": PROJECT_ROOT / "src" / "models" / "tensor-rt" / "flan-t5-tensorrt-int8_wo-engine",
     "jina-v5-tensorrt-int8_wo-engine": PROJECT_ROOT / "src" / "models" / "tensor-rt" / "jina-v5-tensorrt-int8_wo-engine",
+    "trained_models": PROJECT_ROOT / "src" / "models" / "trained_models",
 }
 
 

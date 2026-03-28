@@ -3,8 +3,6 @@ import numpy as np
 import torch
 import torch.nn as nn
 from torch.utils.data import TensorDataset, DataLoader
-from sklearn.preprocessing import StandardScaler
-from sklearn.metrics import mean_squared_error
 from sklearn.ensemble import RandomForestRegressor
 import joblib
 import matplotlib.pyplot as plt
