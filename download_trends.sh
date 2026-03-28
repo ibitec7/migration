@@ -4,7 +4,7 @@
 # Usage: ./download_trends.sh
 #
 # This script downloads the entire trends dataset from the Hugging Face repository
-# and saves it to data/trends/ when run from the project root.
+# and saves it to data/raw/trends/ when run from the project root.
 
 set -e
 
@@ -14,7 +14,7 @@ echo ""
 # Get the directory where this script is located (project root)
 PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 VENV_DIR="${PROJECT_ROOT}/.venv"
-TRENDS_DIR="${PROJECT_ROOT}/data/trends"
+TRENDS_DIR="${PROJECT_ROOT}/data/raw/trends"
 
 echo "Project root: ${PROJECT_ROOT}"
 echo "Virtual environment: ${VENV_DIR}"
@@ -45,7 +45,7 @@ echo ""
 
 # Run the Python script
 cd "${PROJECT_ROOT}"
-.venv/bin/python src/collection/trends.py
+.venv/bin/python -m src.collection.trends
 
 echo ""
 echo "Download complete!"
