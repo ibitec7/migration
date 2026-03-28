@@ -58,7 +58,23 @@ pip install -e .
 
 ### 3. Prepare data
 
-The `run.sh` script prepares and processes the data required for the project. Run it after installing dependencies:
+The repository supports a reproducible Hugging Face bootstrap path (recommended) and a live collection path.
+
+#### Recommended: Reproducible bootstrap from Hugging Face
+
+```bash
+# Download default datasets/models from sdsc2005-migration
+python -m src.main bootstrap --org sdsc2005-migration
+
+# Validate the full bootstrap plan without downloading (safe dry-run)
+python -m src.main bootstrap --org sdsc2005-migration --dry-run
+```
+
+This pulls project datasets/models from Hugging Face into the expected local directories.
+
+#### Optional: Live collection from source systems
+
+The `run.sh` script runs live collection (visa/encounter/trends) and parsing after bootstrap:
 
 > **Linux/macOS**
 
@@ -78,6 +94,27 @@ chmod +x run.sh
 ```
 
 Note: On Windows, if you're using Command Prompt instead of PowerShell, you may need to use `bash run.sh` if you have Git Bash or WSL installed.
+
+## Hugging Face Data/Model Sync
+
+The project includes an HF sync utility:
+
+```bash
+# List repositories in the org
+python -m src.collection.hf_sync list --org sdsc2005-migration
+
+# Download all default datasets
+python -m src.collection.hf_sync download-defaults --org sdsc2005-migration
+
+# Dry-run download plan
+python -m src.collection.hf_sync download-defaults --org sdsc2005-migration --dry-run
+
+# Download TensorRT model artifacts
+python -m src.collection.hf_sync download-models --org sdsc2005-migration
+
+# Upload missing local datasets (encounter, visa, production_outputs)
+python -m src.collection.hf_sync upload-missing --org sdsc2005-migration
+```
 
 ### 4. Get started with development
 
