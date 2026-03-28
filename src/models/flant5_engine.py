@@ -202,10 +202,16 @@ class TensorRTFlanT5Engine:
         """Initialize FLAN-T5 tokenizer from transformers library."""
         try:
             from transformers import T5Tokenizer
-        except ImportError:
+        except ImportError as e:
+            message = str(e)
+            if "No module named 'transformers'" in message or 'No module named "transformers"' in message:
+                raise ImportError(
+                    "transformers library required. Install with: pip install transformers"
+                ) from e
             raise ImportError(
-                "transformers library required. Install with: pip install transformers"
-            )
+                "transformers is installed but failed to import due to a missing runtime dependency. "
+                f"Original error: {message}"
+            ) from e
         
         try:
             # Use pre-trained FLAN-T5-large tokenizer
