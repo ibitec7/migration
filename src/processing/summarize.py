@@ -12,7 +12,6 @@ import json
 import logging
 from pathlib import Path
 from typing import List, Dict, Optional, Tuple, Any
-import numpy as np
 from datetime import datetime
 from tqdm import tqdm
 

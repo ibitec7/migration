@@ -2,17 +2,14 @@ import pandas as pd
 import polars as pl
 import numpy as np
 import matplotlib.pyplot as plt
-import matplotlib.patches as mpatches
-from matplotlib.gridspec import GridSpec
 import seaborn as sns
 from pathlib import Path
-from scipy.stats import pearsonr, spearmanr
-from scipy.cluster.hierarchy import dendrogram, linkage
+from scipy.stats import pearsonr
 from sklearn.preprocessing import StandardScaler
 import warnings
 warnings.filterwarnings('ignore')
 
-from utils import setup_logger, save_figure, add_title_and_save, annotate_max_point
+from src.analysis.utils import setup_logger, save_figure, add_title_and_save
 import logging
 import os
 
@@ -331,7 +328,6 @@ def create_regional_comparison(regional_visa, regional_enc, palette):
     for i, v in enumerate(regional_visa.values):
         ax1.text(v, i, f' {v:,.0f}', va='center', fontsize=10)
     
-    regions_enc = regional_enc.reindex(regions).fillna(0)
     colors_right = sns.color_palette('Reds_r', len(regions))
     ax2.barh(regions, regional_enc.reindex(regions).fillna(0).values, color=colors_right, alpha=0.85, edgecolor='black', linewidth=0.5)
     ax2.set_xlabel('Total Encounters', fontsize=11)
@@ -505,7 +501,7 @@ def create_volatility_chart(distribution_data, palette):
     fig, ax = plt.subplots(figsize=(12, 7))
     
     colors_vol = sns.color_palette('RdYlGn_r', len(volatility_data))
-    bars = ax.barh(volatility_data['country'], volatility_data['visa_cv'], color=colors_vol, alpha=0.85, edgecolor='black', linewidth=0.5)
+    ax.barh(volatility_data['country'], volatility_data['visa_cv'], color=colors_vol, alpha=0.85, edgecolor='black', linewidth=0.5)
     
     ax.set_xlabel('Coefficient of Variation (Volatility)', fontsize=11)
     ax.set_title('Visa Flow Volatility by Country', fontsize=13)
@@ -635,7 +631,7 @@ def create_correlation_chart(corr_df, palette, is_region=True):
         corr_df_sorted = corr_df.sort_values('correlation')
         
         col_name = 'region' if is_region else 'country'
-        bars = ax.barh(corr_df_sorted[col_name], corr_df_sorted['correlation'], color=colors_corr, alpha=0.75, edgecolor='black', linewidth=0.5)
+        ax.barh(corr_df_sorted[col_name], corr_df_sorted['correlation'], color=colors_corr, alpha=0.75, edgecolor='black', linewidth=0.5)
         
         for i, (col_val, corr, pval) in enumerate(zip(corr_df_sorted[col_name], corr_df_sorted['correlation'], corr_df_sorted['p_value'])):
             sig = '***' if pval < 0.001 else ('**' if pval < 0.01 else ('*' if pval < 0.05 else ''))
@@ -692,7 +688,7 @@ def create_growth_trends_chart(growth_df, palette):
     colors_growth = [palette['seasonal_green'] if x > 0 else palette['encounter_primary'] for x in growth_df['avg_annual_growth']]
     growth_sorted = growth_df.sort_values('avg_annual_growth')
     
-    bars = ax.barh(growth_sorted['country'], growth_sorted['avg_annual_growth'], color=colors_growth, alpha=0.75, edgecolor='black', linewidth=0.5)
+    ax.barh(growth_sorted['country'], growth_sorted['avg_annual_growth'], color=colors_growth, alpha=0.75, edgecolor='black', linewidth=0.5)
     
     ax.axvline(x=0, color='black', linestyle='-', linewidth=0.8)
     ax.set_xlabel('Average Annual Growth Rate (%)', fontsize=11)

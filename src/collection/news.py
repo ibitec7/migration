@@ -19,19 +19,14 @@ from typing import Dict, List, Tuple, Optional, Any
 import time
 import random
 
-from utils import setup_logger, retry_errors
-from config import (
+from src.collection.utils import setup_logger, retry_errors
+from src.collection.config import (
     MAX_CONCURRENT_REQUESTS,
     BATCH_WORKER_COUNT,
     TRAFILATURA_WORKER_COUNT,
     DECODE_BATCH_SIZE,
     TRAFILATURA_BATCH_SIZE,
-    PLAYWRIGHT_FALLBACK_THRESHOLD,
-    BACKOFF_FACTORS_HTTP,
-    BACKOFF_JITTER,
     DECODE_BATCH_SLEEP,
-    MAX_REDIRECTS,
-    TIMEOUT_CONFIG,
     TASK_TIMEOUT,
     TRAFILATURA_TIMEOUT,
     TRAFILATURA_OUTPUT_FORMAT,
@@ -40,7 +35,6 @@ from config import (
     TRAFILATURA_WITH_METADATA,
     HEALTH_CHECK_INTERVAL,
     ARTICLE_TIMEOUT_THRESHOLD,
-    PLAYWRIGHT_CONFIG,
     get_timeout_config,
     get_limits_config,
 )

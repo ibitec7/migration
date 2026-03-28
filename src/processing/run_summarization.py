@@ -19,7 +19,7 @@ from pathlib import Path
 from datetime import datetime
 import logging
 
-from .summarize import NewsArticleSummarizer, main
+from .summarize import NewsArticleSummarizer
 from .prompts import get_prompt_template
 from ..models.flant5_engine import TensorRTFlanT5Engine
 from .utils import setup_logger

@@ -5,7 +5,7 @@ Usage:
     python src/collection/trends.py
     
 This script downloads the entire trends dataset from the Hugging Face repository
-and saves it to data/trends/ when run from the project root.
+and saves it to data/raw/trends/ when run from the project root.
 """
 
 import sys
@@ -26,7 +26,7 @@ def download_trends_data():
     
     # Determine the project root (one level up from src/)
     script_dir = Path(__file__).parent.parent.parent
-    trends_dir = script_dir / 'data' / 'trends'
+    trends_dir = script_dir / 'data' / 'raw' / 'trends'
     
     logger.info(f"Project root: {script_dir}")
     logger.info(f"Target directory: {trends_dir}")

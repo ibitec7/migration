@@ -1,7 +1,7 @@
 import httpx
 from bs4 import BeautifulSoup
 from urllib.parse import urljoin
-from utils import setup_logger, download_with_semaphore
+from src.collection.utils import setup_logger, download_with_semaphore
 
 import os
 from tqdm.asyncio import tqdm as atqdm

@@ -10,10 +10,9 @@ Engine Location: src/models/tensor-rt/engines/flan-t5-large/int8_wo_cpu/1-gpu/
 - decoder/: Decoder engine (config.json + rank0.engine)
 """
 
-import os
 import json
 from pathlib import Path
-from typing import List, Optional, Tuple, Union
+from typing import List, Optional, Union
 import numpy as np
 from abc import ABC, abstractmethod
 
@@ -456,8 +455,6 @@ class TensorRTFlanT5Engine:
             import pycuda.driver as cuda
         except ImportError:
             raise ImportError("pycuda required for TensorRT inference. Install with: pip install pycuda")
-        
-        hidden_size = encoder_hidden_states.shape[2]
         
         # Initialize decoder input with EOS token for each sample
         decoder_input_ids = np.full((batch_size, 1), self.EOS_TOKEN_ID, dtype=np.int32)

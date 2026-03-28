@@ -52,7 +52,6 @@ def retry_errors(
         @wraps(func)
         async def wrapper(*args, **kwargs) -> Any:
             last_exception = None
-            client = kwargs.get('client') or (args[0] if args and isinstance(args[0], httpx.AsyncClient) else None)
             url_arg = kwargs.get('url') or (args[1] if len(args) > 1 else args[0] if args else None)
             url_string = url_arg[1] if isinstance(url_arg, tuple) else str(url_arg)
             url_id = url_arg[0] if isinstance(url_arg, tuple) else url_string

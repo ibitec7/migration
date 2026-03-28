@@ -1,4 +1,4 @@
-from utils import setup_logger, download_with_semaphore
+from src.collection.utils import setup_logger, download_with_semaphore
 import httpx
 from bs4 import BeautifulSoup
 from urllib.parse import urljoin

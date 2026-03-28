@@ -1,7 +1,7 @@
 import polars as pl
 import os
 
-from utils import setup_logger, get_optimal_process_count, MONTHS_MAP
+from src.processing.utils import setup_logger, get_optimal_process_count, MONTHS_MAP
 
 os.makedirs("./logs", exist_ok=True)
 

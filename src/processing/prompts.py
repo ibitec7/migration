@@ -6,7 +6,6 @@ key events, important information, and main points from migration-related
 news articles.
 """
 
-from typing import Dict, Any
 
 
 # Primary summarization template
