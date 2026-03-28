@@ -46,3 +46,6 @@ dependencies = [
     "trafilatura>=2.0.0",
     "transformers>=4.35.0",
 ]
+
+[project.scripts]
+migration = "src.main:main"
