@@ -16,3 +16,4 @@ data/processed/*
 
 # Models
 src/models/tensor-rt/*
+src/models/trained_models/*
