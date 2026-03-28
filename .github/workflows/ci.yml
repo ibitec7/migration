@@ -5,6 +5,27 @@ on:
   pull_request:
 
 jobs:
+  build-and-test:
+      runs-on: ubuntu-latest
+      steps:
+        - name: Checkout repository
+          uses: actions/checkout@v4
+
+        # Add this step BEFORE installing dependencies
+        - name: Free Disk Space (Ubuntu)
+          uses: jlumbroso/free-disk-space@main
+          with:
+            # This might remove tools that are pre-installed, but usually frees up ~30GB
+            tool-cache: false
+            android: true
+            dotnet: true
+            haskell: true
+            large-packages: true
+            docker-images: true
+            swap-storage: true
+
+        - name: Install dependencies
+        
   quality:
     runs-on: ubuntu-latest
     steps:
