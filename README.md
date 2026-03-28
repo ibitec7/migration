@@ -2,13 +2,17 @@
 
 A data-driven project that analyzes historical migration data and predicts future migration surges using machine learning techniques.
 
-
-
 ## Overview
 
 This project investigates human migration patterns by studying push and pull factors that influence people's decisions to move between countries. By leveraging historical migration data and real-time interest indicators, the goal is to build predictive models that can forecast future migration surges — valuable for policy makers, city planners, and public health officials to anticipate a surge in immigrant in advance to prepare.
 
+## Key Findings & Production Output
 
+Through our detailed analysis across multiple target countries (available in `data/processed/production_outputs`), we found:
+- **Migration Volume Distribution:** We identified that global visa issuance and migration surges closely follow a Zipfian (power-law) distribution. This means migration flow is hyper-concentrated; the top 20% of countries account for 88.3% of all visas. Additionally, surge anomalies are heavily weighted towards specific states—for instance, Cuba, Mexico, and Afghanistan accounted for the highest excess visa volumes over the 75th percentile limit.
+- **Exchange Rates vs. Visas:** Strong lead correlations exist for several nations. For example, Dominican Republic showed a high positive correlation (0.498, 2-month lag), while Mexico and Colombia showed notable lead potential (6-month and 4-month lags respectively).
+- **Search Trends & Encounters:** We extracted key migration intent signals from trend data (e.g., searches for `cbp_one` or `us_asylum`). Approximately 55% of the visa trend leads showed statistical significance mapping to physical border encounters.
+- **Event Sentiment Dynamics:** Mapped news sentiment onto legal (visa) and unauthorized (encounter) streams to identify precise leading and lagging geopolitical indicators across the 15 targeted nations.
 
 ## Quick Start
 
@@ -176,16 +180,13 @@ migration/
 | `run.sh` | Bash script to automate data preparation and processing. |
 | `README.md` | This file — project overview, setup instructions, and documentation. |
 
-
-
 ## Objectives
 
 - Analyze historical migration data from government and financial sources
 - Identify key **push factors** (inflation, economic instability, conflict) and **pull factors** (job opportunities, currency strength, economic stability)
 - Track real-time migration interest using Google Trends
-- Build predictive models to forecast future migration flows
-
-
+- Process and cluster multinational news streams to discover complex socioeconomic push factors passively
+- Build predictive models to forecast future migration flows across multiple horizons
 
 ## Methodology
 
@@ -199,13 +200,22 @@ migration/
 - Number of illegal border crossings
 - Number of visas granted
 
+### Data Pipeline & NLP
+We orchestrated an expansive automated scraping operation:
+- **Raw Collection:** Scraped **170,784** multi-modal news articles reflecting events within the target countries.
+- **Filtering Pipeline:** Parsed and filtered the articles to **104,333** valid entries, yielding an authoritative pipeline success rate of **~61.1%**.
+- **Embeddings & Cluster Labels:** Processed this vast corpus utilizing edge-optimized NLP frameworks.
+
 ### Models Used
+
 | Model               | Purpose                                               |
 | ------------------- | ----------------------------------------------------- |
-|   BERT              |  Analyzing the sentiment of news                      |
-|   Model2            |  Predicting migration surges                          |
-
-
+| **Jina v5 (TensorRT)** | Generating highly dimensional, performant embeddings across news articles to structure semantic spaces. |
+| **Flan-T5 (TensorRT)** | Sampling key representative articles within dense clusters to autonomously generate descriptive cluster labels. |
+| **cuML Random Forest** | Baseline classification model. High short-term precision and robust baseline without time-degradation (F1: 0.97 for Lead 1). |
+| **PyTorch Transformer** | Multi-head self-attention learner, displaying superior balanced recall capabilities over longer time horizons. |
+| **PyTorch LSTM** | Built with a dedicated `SurgeJointLoss` objective targeting extreme volume threshold alarms. Provides short-term supremacy and highest TP calibration. |
+| **Horizon-Aware Ensemble** | Dynamically re-weighting meta-model leveraging exact strengths of short-term (RF/LSTM) and long-term (Transformer) predictive behaviors. |
 
 ## Data Sources
 
