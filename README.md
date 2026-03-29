@@ -226,4 +226,3 @@ We orchestrated an expansive automated scraping operation:
 | [IMF Financial Data](https://www.imf.org/en/Data)                  | Financial  | Push & pull economic factors            |
 | [Google Trends (via pytrends)](https://pypi.org/project/pytrends/) | API        | Real-time migration interest tracking   |
 | [Google News (via pygooglenews)](https://pypi.org/project/pygooglenews/) | API        | News sentiment analysis   |
-| [ETL on Yahoo Finance (via indicators-cli ETL tool)](https://pypi.org/project/indicators-cli/) | ETL        | Financial health and indicators    |
