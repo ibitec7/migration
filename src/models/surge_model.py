@@ -1,3 +1,4 @@
+import datetime
 import polars as pl
 import numpy as np
 import torch
@@ -6,6 +7,15 @@ from torch.utils.data import TensorDataset, DataLoader
 from sklearn.preprocessing import StandardScaler
 from sklearn.metrics import mean_squared_error
 from src.models.surge_metrics import evaluate_surge_performance
+
+
+def _add_months(d: datetime.date, n: int) -> datetime.date:
+    """Return the date exactly *n* months after (or before, if negative) *d*,
+    normalised to the 1st of the resulting month."""
+    month = d.month - 1 + n
+    year  = d.year + month // 12
+    month = month % 12 + 1
+    return datetime.date(year, month, 1)
 
 class SurgeJointLoss(nn.Module):
     def __init__(self, alpha=0.5, surge_threshold=1.0):
@@ -120,8 +130,27 @@ def train_surge_dl(model, train_loader, epochs=20, lr=1e-3, device='cuda'):
 def run_evaluation_split():
     df = pl.read_parquet("data/processed/train_panel.parquet").drop_nulls()
 
-    train_df = df.filter(pl.col("month").dt.year() <= 2022)
-    test_df = df.filter(pl.col("month").dt.year() > 2022)
+    # ---------------------------------------------------------------------------
+    # Horizon-safe temporal split
+    # ---------------------------------------------------------------------------
+    # The maximum forecast horizon is 6 months.  Using a naïve year-boundary
+    # cutoff (≤2022) causes leakage: rows from July–December 2022 have lead
+    # targets that extend into the test period (2023+).  To eliminate this we
+    # apply a 6-month buffer so that every training target falls strictly before
+    # the start of the test period.
+    #
+    #   Training rows  : month  <  TRAIN_CUTOFF  (= 2022-07-01)
+    #                    → last safe training month is 2022-06
+    #                    → target_visa_lead_6 for 2022-06 = 2022-12 (still in train)
+    #   Gap rows       : 2022-07 to 2022-12 (excluded from both splits)
+    #   Test rows      : month  ≥ TEST_START     (= 2023-01-01)
+    # ---------------------------------------------------------------------------
+    FORECAST_HORIZON = 6  # months (max lead)
+    test_start   = datetime.date(2023, 1, 1)
+    train_cutoff = _add_months(test_start, -FORECAST_HORIZON)  # 2022-07-01
+
+    train_df = df.filter(pl.col("month") < pl.lit(train_cutoff))
+    test_df  = df.filter(pl.col("month") >= pl.lit(test_start))
 
     X_train_seq, Y_train_seq, C_train_seq, scaler_x, scaler_y, num_c = build_sequential_tensors(train_df, is_train=True)
     X_test_seq, Y_test_seq, C_test_seq, _, _, _ = build_sequential_tensors(test_df, scaler_x=scaler_x, scaler_y=scaler_y, is_train=False)
@@ -142,6 +171,12 @@ def run_evaluation_split():
         lstm_preds = scaler_y.inverse_transform(lstm_preds_scaled)
         y_test_unscaled = scaler_y.inverse_transform(Y_test_seq.numpy())
 
+    # Pre-compute per-lead training statistics so the surge threshold is anchored
+    # to the training distribution (prevents test-set statistics from influencing
+    # the evaluation threshold).
+    target_cols = [f"target_visa_lead_{i}" for i in range(1, 7)]
+    y_train_raw = train_df.select(target_cols).to_numpy()
+
     print("\n[Surge Target Discovery Results - PyTorch LSTM + Huber/BCE]")
     # Test surge capabilities specifically
     for i in range(6):
@@ -149,7 +184,11 @@ def run_evaluation_split():
         pred = lstm_preds[:, i]
         
         rmse = mean_squared_error(truth, pred) ** 0.5
-        surge_metrics = evaluate_surge_performance(truth, pred, threshold_std=1.5)
+        surge_metrics = evaluate_surge_performance(
+            truth, pred, threshold_std=1.5,
+            train_mean=float(np.mean(y_train_raw[:, i])),
+            train_std=float(np.std(y_train_raw[:, i])),
+        )
         
         print(f"Lead {i+1} Month | RMSE: {rmse:.2f} | " + 
                f"Surge Precision: {surge_metrics['precision']:.2f}, " +

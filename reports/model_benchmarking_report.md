@@ -2,14 +2,43 @@
 
 **Note:** *This report has been updated to explicitly include the F1, Precision, and Recall classification metrics for the Baseline Random Forest and Transformer models in Section 2.*
 
+**Data Integrity Update:** *Following an audit of the training strategy, two sources of future-data leakage were identified and corrected (see Section 0 below).*
+
 ## Overview
 This report evaluates the performance of three core architectural approaches developed for predicting surges in legal (visa) and illegal (encounter) migration patterns for the 15 highest-volume target countries.                             
-The predictive horizon is evaluated from a 1-month lead up to a 6-month lead. Performance was strictly evaluated OOT (Out-of-Time) on a Walk-Forward validation split where models were trained exclusively on data prior to 2023, and evaluated on rolling real-time predictions occurring throughout 2023+.                   
+The predictive horizon is evaluated from a 1-month lead up to a 6-month lead. Performance is evaluated Out-of-Time (OOT) on a **single temporal split**: models are trained on data strictly before the horizon-safe training cutoff (2022-06 inclusive) and evaluated on data from 2023 onwards.
+
+> **Training strategy clarification:** The pipeline uses a **single OOT split with a horizon-safety buffer**, *not* a walk-forward expanding window.  A walk-forward expanding window cross-validation utility (`walk_forward_expanding_window_cv` in `src/models/train_and_evaluate.py`) is now available for robust offline evaluation.
+
 Models evaluated:
 1. **Random Forest (cuML GPU-accelerated)**: A tabular rolling-window tree-based baseline.
 2. **PyTorch Shared Transformer**: Multi-head self-attention sequence learner.
 3. **PyTorch LSTM**: Recurrent Neural Network using the proposed `SurgeJointLoss` (combined Huber + BCE) targeting explicitly predefined extreme events (> 1.5 standard deviations over moving average) combined with spatial Country Embeddings (`nn.Embedding`).
 4. **Horizon-Aware Ensemble**: A post-hoc meta-model that dynamically re-weights trust across the three core architectures based strictly on the predictive lead-time.
+
+---
+
+## 0. Data Integrity Audit & Leakage Fixes
+
+Two sources of **future-data leakage** were identified and corrected prior to the benchmarking results in this report:
+
+### Leakage 1 – Training labels leaked from the test period
+
+**Root cause:** The original training cutoff was `month.year ≤ 2022`.  Because each training row carries up to 6 lead-target columns (created via `shift(-lag)` in `build_panel.py`), rows from July–December 2022 contained target values drawn from January–June 2023 — the test period.
+
+| Training month | target_visa_lead_1 (month referenced) | target_visa_lead_6 (month referenced) |
+| :------------- | :------------------------------------ | :------------------------------------ |
+| 2022-12        | 2023-01 ⚠️                            | 2023-06 ⚠️                            |
+| 2022-07        | 2022-08 ✅                             | 2023-01 ⚠️                            |
+| 2022-06        | 2022-07 ✅                             | 2022-12 ✅                             |
+
+**Fix:** A `FORECAST_HORIZON = 6` month buffer is applied.  The effective training cutoff is now `month < 2022-07-01` (last safe training month: **2022-06**), ensuring that even the 6-month lead target stays within the training period.  Rows from 2022-07 to 2022-12 form a **gap period** that is excluded from both splits.
+
+### Leakage 2 – Surge detection threshold computed from test-set statistics
+
+**Root cause:** `evaluate_surge_performance` previously computed the surge threshold (`mean + 1.5 × std`) using the test-set values of `y_true`.  This meant the threshold definition changed with the test set, and test-set information implicitly influenced what was labelled a "surge" during evaluation.
+
+**Fix:** `evaluate_surge_performance` now accepts optional `train_mean` and `train_std` parameters.  All callers in `train_and_evaluate.py` and `surge_model.py` pass the statistics computed exclusively on the training split, anchoring the surge definition to the training distribution.
 
 ---
 
@@ -35,6 +64,8 @@ The Root Mean Squared Error measures how accurately the model predicted the exac
 ## 2. Sharp Surge Classification Performance (F1, Precision, Recall)
 
 Because operational preparedness values correctly predicting the *onset* of severe crises over getting the nominal volume exactly right, all models were evaluated on their ability to predict threshold excursions ($> 1.5 \sigma$ standard deviations above the normative rolling mean). The `MigrationLSTM` architecture uniquely uses a `SurgeJointLoss` objective penalty to optimize for this directly, while the RF and Transformer rely on pure MSE regression thresholds.
+
+**Surge threshold:** defined as `train_mean + 1.5 × train_std` per lead horizon, where statistics are computed exclusively on the training split (see Section 0, Leakage 2 fix).
 
 **OOT Test Surges Detected (Actual > 1.5 Std Dev Spikes): ~103 to 114 instances** 
 
@@ -91,3 +122,4 @@ The architectural hypothesis requested in the plan has been effectively validate
 1. **Self-Attention vs Recurrence:** At the constrained 6-month sequence length natively available to the panel data, the recurrent biases of the LSTM significantly outpaced the Transformer purely for absolute volume regression (RMSE), but the Transformer maintains highly competitive robust predictive margins for classifying severe longer-term shocks (Recall/F1).
 2. **Standard Trees Are Formidable Classification Baselines:** cuML Random Forests provide a highly robust, non-degrading baseline for classification and actually top the F1 boards due to sheer Recall velocity. It makes them an excellent fallback candidate for capturing general trend momentum.
 3. **Loss Dynamics:** Combining Huber volume approximation with explicit Classification BCE (SurgeJointLoss) proves capable of training models that serve as highly calibrated "Crisis Early Warning Systems," optimizing specifically against False Alarms dynamically across borders.
+
