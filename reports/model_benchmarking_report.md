@@ -39,7 +39,7 @@ Because operational preparedness values correctly predicting the *onset* of seve
 **OOT Test Surges Detected (Actual > 1.5 Std Dev Spikes): ~103 to 114 instances** 
 
 ### A. Random Forest Baseline (cuML)
-| Horizon    | Precision (False Alarm Rate) | Recall (Miss Rate) | F1-Score |
+| Horizon    | Precision (No False Alarms) | Recall (No Miss) | F1-Score |
 | :--------- | :--------------------------- | :----------------- | :------- |
 | **Lead 1** | 0.96                         | 0.97               | **0.97** |
 | **Lead 2** | 0.93                         | 0.95               | **0.94** |
@@ -49,7 +49,7 @@ Because operational preparedness values correctly predicting the *onset* of seve
 | **Lead 6** | 0.78                         | 0.91               | **0.84** |
 
 ### B. PyTorch Transformer
-| Horizon    | Precision (False Alarm Rate) | Recall (Miss Rate) | F1-Score |
+| Horizon    | Precision (No False Alarms) | Recall (No Miss) | F1-Score |
 | :--------- | :--------------------------- | :----------------- | :------- |
 | **Lead 1** | 0.95                         | 0.93               | **0.94** |
 | **Lead 2** | 0.95                         | 0.94               | **0.94** |
@@ -59,7 +59,7 @@ Because operational preparedness values correctly predicting the *onset* of seve
 | **Lead 6** | 0.83                         | 0.90               | **0.87** |
 
 ### C. PyTorch LSTM (SurgeJointLoss)
-| Horizon    | Precision (False Alarm Rate) | Recall (Miss Rate) | F1-Score |
+| Horizon    | Precision (No False Alarms) | Recall (No Miss) | F1-Score |
 | :--------- | :--------------------------- | :----------------- | :------- |
 | **Lead 1** | 0.97                         | 0.85               | **0.91** |
 | **Lead 2** | 0.94                         | 0.84               | **0.89** |
@@ -69,7 +69,7 @@ Because operational preparedness values correctly predicting the *onset* of seve
 | **Lead 6** | 0.82                         | 0.79               | **0.80** |
 
 ### D. Horizon-Aware Ensemble (Dynamic Weighting)
-| Horizon    | Precision (False Alarm Rate) | Recall (Miss Rate) | F1-Score |
+| Horizon    | Precision (No False Alarms) | Recall (No Miss) | F1-Score |
 | :--------- | :--------------------------- | :----------------- | :------- |
 | **Lead 1** | 0.96                         | 0.96               | **0.96** |
 | **Lead 2** | 0.93                         | 0.96               | **0.95** |
