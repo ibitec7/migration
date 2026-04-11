@@ -1,0 +1,63 @@
+\contentsline {section}{\numberline {1}Introduction}{3}{section.1}%
+\contentsline {subsection}{\numberline {1.1}Study Context and Motivation}{3}{subsection.1.1}%
+\contentsline {subsection}{\numberline {1.2}Research Questions}{3}{subsection.1.2}%
+\contentsline {section}{\numberline {2}Methods}{3}{section.2}%
+\contentsline {subsection}{\numberline {2.1}Data Collection and Multi-Modal Ingestion}{3}{subsection.2.1}%
+\contentsline {paragraph}{Ground Truth---Visa Issuances.}{3}{paragraph*.1}%
+\contentsline {paragraph}{Ground Truth---Border Encounters.}{3}{paragraph*.2}%
+\contentsline {paragraph}{News Articles.}{4}{paragraph*.3}%
+\contentsline {paragraph}{Google Trends.}{4}{paragraph*.4}%
+\contentsline {paragraph}{Exchange Rates.}{4}{paragraph*.5}%
+\contentsline {subsection}{\numberline {2.2}NLP Processing and Feature Engineering}{4}{subsection.2.2}%
+\contentsline {paragraph}{Embedding Generation.}{4}{paragraph*.6}%
+\contentsline {paragraph}{Event Clustering.}{4}{paragraph*.7}%
+\contentsline {paragraph}{Autonomous Cluster Labelling.}{4}{paragraph*.8}%
+\contentsline {paragraph}{Headline-Level Scoring.}{4}{paragraph*.9}%
+\contentsline {paragraph}{Panel Construction.}{5}{paragraph*.10}%
+\contentsline {subsection}{\numberline {2.3}Exploratory Data Analysis}{5}{subsection.2.3}%
+\contentsline {paragraph}{Seasonal Patterns and Pandemic Disruption.}{5}{paragraph*.11}%
+\contentsline {paragraph}{Zipfian Concentration and Country Volatility.}{5}{paragraph*.13}%
+\contentsline {subsection}{\numberline {2.4}Lead--Lag Signal Analysis}{5}{subsection.2.4}%
+\contentsline {subsection}{\numberline {2.5}Predictive Models}{6}{subsection.2.5}%
+\contentsline {paragraph}{cuML Random Forest.}{6}{paragraph*.15}%
+\contentsline {paragraph}{LSTM with SurgeJointLoss.}{6}{paragraph*.16}%
+\contentsline {paragraph}{Transformer Encoder.}{6}{paragraph*.17}%
+\contentsline {paragraph}{Horizon-Aware Ensemble.}{6}{paragraph*.18}%
+\contentsline {subsection}{\numberline {2.6}Validation Strategy}{6}{subsection.2.6}%
+\contentsline {section}{\numberline {3}Results}{7}{section.3}%
+\contentsline {subsection}{\numberline {3.1}Multi-Signal Analysis (RQ3)}{7}{subsection.3.1}%
+\contentsline {paragraph}{News Event Signals.}{7}{paragraph*.19}%
+\contentsline {paragraph}{Exchange Rate Signals.}{7}{paragraph*.20}%
+\contentsline {paragraph}{Google Trends.}{7}{paragraph*.21}%
+\contentsline {paragraph}{Modality Ranking.}{7}{paragraph*.22}%
+\contentsline {subsection}{\numberline {3.2}Model Performance}{7}{subsection.3.2}%
+\contentsline {subsection}{\numberline {3.3}Architecture Insights (RQ2)}{7}{subsection.3.3}%
+\contentsline {section}{\numberline {4}Conclusion}{8}{section.4}%
+\contentsline {subsection}{\numberline {4.1}Practical Implications}{8}{subsection.4.1}%
+\contentsline {subsection}{\numberline {4.2}Limitations}{8}{subsection.4.2}%
+\contentsline {paragraph}{The Digital Divide.}{8}{paragraph*.25}%
+\contentsline {paragraph}{Correlation, Not Causation.}{8}{paragraph*.26}%
+\contentsline {paragraph}{Exchange Rate Data Gap.}{9}{paragraph*.27}%
+\contentsline {paragraph}{Black Swan Events.}{9}{paragraph*.28}%
+\contentsline {subsection}{\numberline {4.3}Future Work}{9}{subsection.4.3}%
+\contentsline {subsection}{\numberline {4.4}Code and Data Availability}{9}{subsection.4.4}%
+\contentsline {section}{\numberline {5}Contribution Statement}{9}{section.5}%
+\contentsline {section}{Appendices}{12}{section*.29}%
+\contentsline {section}{\numberline {A}Per-Horizon Surge Classification}{12}{appendix.1.A}%
+\contentsline {section}{\numberline {B}Detailed Event Signal Analysis}{12}{appendix.1.B}%
+\contentsline {paragraph}{News event clusters.}{12}{paragraph*.34}%
+\contentsline {paragraph}{Headline sentiment scores.}{13}{paragraph*.35}%
+\contentsline {paragraph}{Exchange rate and Trends signals.}{13}{paragraph*.36}%
+\contentsline {section}{\numberline {C}Extended Limitations}{13}{appendix.1.C}%
+\contentsline {paragraph}{Google Trends as a Weak Standalone Predictor.}{13}{paragraph*.37}%
+\contentsline {paragraph}{News Coverage Bias.}{13}{paragraph*.38}%
+\contentsline {paragraph}{Feature Interpretability and Selective Collection.}{13}{paragraph*.39}%
+\contentsline {paragraph}{Model Staleness and Distributional Drift.}{13}{paragraph*.40}%
+\contentsline {paragraph}{Survivorship Bias in Encounter Data.}{13}{paragraph*.41}%
+\contentsline {section}{\numberline {D}Ensemble Weight Schedule}{14}{appendix.1.D}%
+\contentsline {section}{\numberline {E}Future Work}{14}{appendix.1.E}%
+\contentsline {section}{\numberline {F}Data Pipeline Engineering Details}{14}{appendix.1.F}%
+\contentsline {section}{\numberline {G}Cluster Quality Analysis}{14}{appendix.1.G}%
+\contentsline {paragraph}{Silhouette Scores.}{14}{paragraph*.43}%
+\contentsline {paragraph}{Number of Unique Clusters.}{15}{paragraph*.45}%
+\contentsline {section}{\numberline {H}F1-Score Trajectory Across Forecast Horizons}{15}{appendix.1.H}%

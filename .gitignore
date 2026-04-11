@@ -9,6 +9,9 @@ wheels/
 # Virtual environments
 .venv
 
+# GitHub Wiki export (generated; do not commit)
+wiki_export/
+
 # Folders
 logs/*
 data/raw/*

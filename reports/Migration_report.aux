@@ -1,0 +1,158 @@
+\relax 
+\providecommand\hyper@newdestlabel[2]{}
+\providecommand*\HyPL@Entry[1]{}
+\HyPL@Entry{0<</S/D>>}
+\citation{undesa2020}
+\citation{cbp_encounters}
+\citation{state_dept_visa}
+\citation{cbp_encounters}
+\citation{polars}
+\@writefile{toc}{\contentsline {section}{\numberline {1}Introduction}{3}{section.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {1.1}Study Context and Motivation}{3}{subsection.1.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {1.2}Research Questions}{3}{subsection.1.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {2}Methods}{3}{section.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.1}Data Collection and Multi-Modal Ingestion}{3}{subsection.2.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Ground Truth---Visa Issuances.}{3}{paragraph*.1}\protected@file@percent }
+\newlabel{sec:data_collection}{{2.1}{3}{Ground Truth---Visa Issuances}{paragraph*.1}{}}
+\@writefile{toc}{\contentsline {paragraph}{Ground Truth---Border Encounters.}{3}{paragraph*.2}\protected@file@percent }
+\citation{google_news}
+\citation{trafilatura}
+\citation{google_trends}
+\citation{imf_reer}
+\citation{gunter2024jina}
+\citation{tensorrt}
+\citation{campello2013}
+\citation{rapids_cuml}
+\citation{mcinnes2018}
+\citation{vandermaaten2008}
+\citation{raffel2020,tensorrt}
+\@writefile{toc}{\contentsline {paragraph}{News Articles.}{4}{paragraph*.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Google Trends.}{4}{paragraph*.4}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Exchange Rates.}{4}{paragraph*.5}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.2}NLP Processing and Feature Engineering}{4}{subsection.2.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Embedding Generation.}{4}{paragraph*.6}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Event Clustering.}{4}{paragraph*.7}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Autonomous Cluster Labelling.}{4}{paragraph*.8}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Headline-Level Scoring.}{4}{paragraph*.9}\protected@file@percent }
+\newlabel{eq:sentiment}{{1}{4}{Headline-Level Scoring}{equation.2.1}{}}
+\citation{benjamini1995}
+\citation{breiman2001,rapids_cuml}
+\@writefile{toc}{\contentsline {paragraph}{Panel Construction.}{5}{paragraph*.10}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.3}Exploratory Data Analysis}{5}{subsection.2.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Seasonal Patterns and Pandemic Disruption.}{5}{paragraph*.11}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {1}{\ignorespaces Seasonal Patterns: Monthly Visa Issuances Heatmap (2017--2025). Darker red shading indicates higher monthly volume. The light-coloured column at 2020 reflects near-complete consulate closures during the COVID-19 pandemic.}}{5}{figure.caption.12}\protected@file@percent }
+\providecommand*\caption@xref[2]{\@setref\relax\@undefined{#1}}
+\newlabel{fig:seasonal_heatmap}{{1}{5}{Seasonal Patterns: Monthly Visa Issuances Heatmap (2017--2025). Darker red shading indicates higher monthly volume. The light-coloured column at 2020 reflects near-complete consulate closures during the COVID-19 pandemic}{figure.caption.12}{}}
+\@writefile{toc}{\contentsline {paragraph}{Zipfian Concentration and Country Volatility.}{5}{paragraph*.13}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.4}Lead--Lag Signal Analysis}{5}{subsection.2.4}\protected@file@percent }
+\citation{hochreiter1997}
+\citation{huber1964}
+\citation{pytorch}
+\citation{kingma2015}
+\citation{vaswani2017,pytorch}
+\@writefile{lof}{\contentsline {figure}{\numberline {2}{\ignorespaces Visa flow volatility by country, measured as the coefficient of variation of monthly visa issuances. Higher values indicate more erratic, surge-prone flows. Colour encodes volatility level (red~$=$~high, green~$=$~moderate).}}{6}{figure.caption.14}\protected@file@percent }
+\newlabel{fig:visa_volatility}{{2}{6}{Visa flow volatility by country, measured as the coefficient of variation of monthly visa issuances. Higher values indicate more erratic, surge-prone flows. Colour encodes volatility level (red~$=$~high, green~$=$~moderate)}{figure.caption.14}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.5}Predictive Models}{6}{subsection.2.5}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{cuML Random Forest.}{6}{paragraph*.15}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{LSTM with SurgeJointLoss.}{6}{paragraph*.16}\protected@file@percent }
+\newlabel{eq:surge_loss}{{2}{6}{LSTM with SurgeJointLoss}{equation.2.2}{}}
+\@writefile{toc}{\contentsline {paragraph}{Transformer Encoder.}{6}{paragraph*.17}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Horizon-Aware Ensemble.}{6}{paragraph*.18}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.6}Validation Strategy}{6}{subsection.2.6}\protected@file@percent }
+\citation{hamilton1994,sims1980}
+\@writefile{toc}{\contentsline {section}{\numberline {3}Results}{7}{section.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.1}Multi-Signal Analysis (RQ3)}{7}{subsection.3.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{News Event Signals.}{7}{paragraph*.19}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Exchange Rate Signals.}{7}{paragraph*.20}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Google Trends.}{7}{paragraph*.21}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Modality Ranking.}{7}{paragraph*.22}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.2}Model Performance}{7}{subsection.3.2}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {1}{\ignorespaces Average surge-classification performance (Leads 1--6, OOT test set).}}{7}{table.caption.23}\protected@file@percent }
+\newlabel{tab:summary_perf}{{1}{7}{Average surge-classification performance (Leads 1--6, OOT test set)}{table.caption.23}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.3}Architecture Insights (RQ2)}{7}{subsection.3.3}\protected@file@percent }
+\citation{imf_reer}
+\@writefile{lot}{\contentsline {table}{\numberline {2}{\ignorespaces Out-of-time RMSE by model and horizon (lower is better). Bold marks best per row.}}{8}{table.caption.24}\protected@file@percent }
+\newlabel{tab:rmse}{{2}{8}{Out-of-time RMSE by model and horizon (lower is better). Bold marks best per row}{table.caption.24}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {4}Conclusion}{8}{section.4}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.1}Practical Implications}{8}{subsection.4.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.2}Limitations}{8}{subsection.4.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{The Digital Divide.}{8}{paragraph*.25}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Correlation, Not Causation.}{8}{paragraph*.26}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Exchange Rate Data Gap.}{9}{paragraph*.27}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Black Swan Events.}{9}{paragraph*.28}\protected@file@percent }
+\newlabel{sec:limitations}{{4.2}{9}{Black Swan Events}{paragraph*.28}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.3}Future Work}{9}{subsection.4.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.4}Code and Data Availability}{9}{subsection.4.4}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {5}Contribution Statement}{9}{section.5}\protected@file@percent }
+\bibstyle{plainnat}
+\bibdata{references}
+\bibcite{trafilatura}{{1}{2021}{{Barbaresi}}{{}}}
+\bibcite{benjamini1995}{{2}{1995}{{Benjamini and Hochberg}}{{}}}
+\bibcite{breiman2001}{{3}{2001}{{Breiman}}{{}}}
+\bibcite{campello2013}{{4}{2013}{{Campello et~al.}}{{Campello, Moulavi, and Sander}}}
+\bibcite{google_news}{{5}{2025{a}}{{Google}}{{}}}
+\bibcite{google_trends}{{6}{2025{b}}{{Google}}{{}}}
+\bibcite{gunter2024jina}{{7}{2024}{{G{\"u}nther et~al.}}{{G{\"u}nther, Milliken, Geuter, Mastrapas, Wang, and Xiao}}}
+\bibcite{hamilton1994}{{8}{1994}{{Hamilton}}{{}}}
+\bibcite{hochreiter1997}{{9}{1997}{{Hochreiter and Schmidhuber}}{{}}}
+\bibcite{huber1964}{{10}{1964}{{Huber}}{{}}}
+\bibcite{imf_reer}{{11}{2025}{{International Monetary Fund}}{{}}}
+\bibcite{kingma2015}{{12}{2015}{{Kingma and Ba}}{{}}}
+\bibcite{mcinnes2018}{{13}{2018}{{McInnes et~al.}}{{McInnes, Healy, and Melville}}}
+\bibcite{tensorrt}{{14}{2024}{{NVIDIA Corporation}}{{}}}
+\bibcite{pytorch}{{15}{2019}{{Paszke et~al.}}{{Paszke, Gross, Massa, Lerer, Bradbury, Chanan, Killeen, Lin, Gimelshein, Antiga, et~al.}}}
+\bibcite{raffel2020}{{16}{2020}{{Raffel et~al.}}{{Raffel, Shazeer, Roberts, Lee, Narang, Matena, Zhou, Li, and Liu}}}
+\bibcite{rapids_cuml}{{17}{2024}{{RAPIDS Development Team}}{{}}}
+\bibcite{sims1980}{{18}{1980}{{Sims}}{{}}}
+\bibcite{undesa2020}{{19}{2020}{{United Nations Department of Economic and Social Affairs}}{{}}}
+\bibcite{cbp_encounters}{{20}{2026}{{U.S. Customs and Border Protection}}{{}}}
+\bibcite{state_dept_visa}{{21}{2025}{{U.S. Department of State, Bureau of Consular Affairs}}{{}}}
+\bibcite{vandermaaten2008}{{22}{2008}{{van~der Maaten and Hinton}}{{}}}
+\bibcite{vaswani2017}{{23}{2017}{{Vaswani et~al.}}{{Vaswani, Shazeer, Parmar, Uszkoreit, Jones, Gomez, Kaiser, and Polosukhin}}}
+\bibcite{polars}{{24}{2024}{{Vink}}{{}}}
+\@writefile{toc}{\contentsline {section}{Appendices}{12}{section*.29}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {A}Per-Horizon Surge Classification}{12}{appendix.1.A}\protected@file@percent }
+\newlabel{app:perhorizon}{{A}{12}{Per-Horizon Surge Classification}{appendix.1.A}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {3}{\ignorespaces Random Forest surge classification (OOT).}}{12}{table.caption.30}\protected@file@percent }
+\newlabel{tab:rf_class}{{3}{12}{Random Forest surge classification (OOT)}{table.caption.30}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {4}{\ignorespaces Transformer Encoder surge classification (OOT).}}{12}{table.caption.31}\protected@file@percent }
+\newlabel{tab:trans_class}{{4}{12}{Transformer Encoder surge classification (OOT)}{table.caption.31}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {5}{\ignorespaces LSTM (SurgeJointLoss) surge classification (OOT).}}{12}{table.caption.32}\protected@file@percent }
+\newlabel{tab:lstm_class}{{5}{12}{LSTM (SurgeJointLoss) surge classification (OOT)}{table.caption.32}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {B}Detailed Event Signal Analysis}{12}{appendix.1.B}\protected@file@percent }
+\newlabel{app:events}{{B}{12}{Detailed Event Signal Analysis}{appendix.1.B}{}}
+\@writefile{toc}{\contentsline {paragraph}{News event clusters.}{12}{paragraph*.34}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {6}{\ignorespaces Horizon-Aware Ensemble surge classification (OOT).}}{13}{table.caption.33}\protected@file@percent }
+\newlabel{tab:ens_class}{{6}{13}{Horizon-Aware Ensemble surge classification (OOT)}{table.caption.33}{}}
+\@writefile{toc}{\contentsline {paragraph}{Headline sentiment scores.}{13}{paragraph*.35}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Exchange rate and Trends signals.}{13}{paragraph*.36}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {C}Extended Limitations}{13}{appendix.1.C}\protected@file@percent }
+\newlabel{app:limitations}{{C}{13}{Extended Limitations}{appendix.1.C}{}}
+\@writefile{toc}{\contentsline {paragraph}{Google Trends as a Weak Standalone Predictor.}{13}{paragraph*.37}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{News Coverage Bias.}{13}{paragraph*.38}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Feature Interpretability and Selective Collection.}{13}{paragraph*.39}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Model Staleness and Distributional Drift.}{13}{paragraph*.40}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Survivorship Bias in Encounter Data.}{13}{paragraph*.41}\protected@file@percent }
+\citation{google_news}
+\citation{trafilatura}
+\@writefile{toc}{\contentsline {section}{\numberline {D}Ensemble Weight Schedule}{14}{appendix.1.D}\protected@file@percent }
+\newlabel{app:weights}{{D}{14}{Ensemble Weight Schedule}{appendix.1.D}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {7}{\ignorespaces Horizon-Aware Ensemble weights (sum to 1.0 per row).}}{14}{table.caption.42}\protected@file@percent }
+\newlabel{tab:ensemble_weights}{{7}{14}{Horizon-Aware Ensemble weights (sum to 1.0 per row)}{table.caption.42}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {E}Future Work}{14}{appendix.1.E}\protected@file@percent }
+\newlabel{app:futurework}{{E}{14}{Future Work}{appendix.1.E}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {F}Data Pipeline Engineering Details}{14}{appendix.1.F}\protected@file@percent }
+\newlabel{app:pipeline}{{F}{14}{Data Pipeline Engineering Details}{appendix.1.F}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {G}Cluster Quality Analysis}{14}{appendix.1.G}\protected@file@percent }
+\newlabel{app:clusterquality}{{G}{14}{Cluster Quality Analysis}{appendix.1.G}{}}
+\@writefile{toc}{\contentsline {paragraph}{Silhouette Scores.}{14}{paragraph*.43}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {3}{\ignorespaces Silhouette scores by country for HDBSCAN event clusters. Values above 0.5 indicate well-separated, internally coherent clusters. Most countries exceed this threshold, validating the Jina~v5 embedding space as a meaningful basis for thematic grouping.}}{15}{figure.caption.44}\protected@file@percent }
+\newlabel{fig:silhouette}{{3}{15}{Silhouette scores by country for HDBSCAN event clusters. Values above 0.5 indicate well-separated, internally coherent clusters. Most countries exceed this threshold, validating the Jina~v5 embedding space as a meaningful basis for thematic grouping}{figure.caption.44}{}}
+\@writefile{toc}{\contentsline {paragraph}{Number of Unique Clusters.}{15}{paragraph*.45}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {4}{\ignorespaces Number of unique HDBSCAN event clusters per country. Greater cluster counts indicate richer thematic diversity in the collected news corpus, providing more candidate leading indicators per origin.}}{15}{figure.caption.46}\protected@file@percent }
+\newlabel{fig:unique_clusters}{{4}{15}{Number of unique HDBSCAN event clusters per country. Greater cluster counts indicate richer thematic diversity in the collected news corpus, providing more candidate leading indicators per origin}{figure.caption.46}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {H}F1-Score Trajectory Across Forecast Horizons}{15}{appendix.1.H}\protected@file@percent }
+\newlabel{app:f1horizon}{{H}{15}{F1-Score Trajectory Across Forecast Horizons}{appendix.1.H}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {5}{\ignorespaces F1 scores for surge detection across forecast lead times (Leads 1--6). All models degrade with increasing horizon; the Horizon-Aware Ensemble (red star) consistently outperforms individual architectures at every lead. The LSTM (JointLoss, green triangle) trades lower F1 for higher precision, visible as the most conservative trajectory.}}{16}{figure.caption.47}\protected@file@percent }
+\newlabel{fig:f1_horizon}{{5}{16}{F1 scores for surge detection across forecast lead times (Leads 1--6). All models degrade with increasing horizon; the Horizon-Aware Ensemble (red star) consistently outperforms individual architectures at every lead. The LSTM (JointLoss, green triangle) trades lower F1 for higher precision, visible as the most conservative trajectory}{figure.caption.47}{}}
+\gdef \@abspage@last{16}

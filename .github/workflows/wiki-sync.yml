@@ -1,0 +1,64 @@
+name: Wiki
+
+on:
+  push:
+    branches: [main, master]
+    paths:
+      - "wiki/**"
+      - "scripts/wiki_common.py"
+      - "scripts/sync_github_wiki.py"
+      - "scripts/validate_wiki_export.py"
+      - "scripts/validate_wiki_links.py"
+      - ".github/workflows/wiki-sync.yml"
+  pull_request:
+    paths:
+      - "wiki/**"
+      - "scripts/wiki_common.py"
+      - "scripts/sync_github_wiki.py"
+      - "scripts/validate_wiki_export.py"
+      - "scripts/validate_wiki_links.py"
+      - ".github/workflows/wiki-sync.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  wiki:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Validate Obsidian wikilinks
+        run: python3 scripts/validate_wiki_links.py
+
+      - name: Export and validate GitHub Wiki links
+        run: python3 scripts/sync_github_wiki.py /tmp/github_wiki_export --validate
+
+      - name: Publish to GitHub Wiki
+        if: (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master') && github.event_name != 'pull_request'
+        env:
+          WIKI_PUSH_TOKEN: ${{ secrets.WIKI_PUSH_TOKEN }}
+        run: |
+          set -e
+          if [ -z "${WIKI_PUSH_TOKEN:-}" ]; then
+            echo "WIKI_PUSH_TOKEN is not set; skipping wiki push. Add a repo secret with a PAT that can push to this repository's wiki."
+            exit 0
+          fi
+          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git config --global user.name "github-actions[bot]"
+          REPO="${{ github.repository }}"
+          git clone --depth=1 "https://x-access-token:${WIKI_PUSH_TOKEN}@github.com/${REPO}.wiki.git" /tmp/wikirepo
+          cp -a /tmp/github_wiki_export/. /tmp/wikirepo/
+          cd /tmp/wikirepo
+          git add -A
+          if git diff --staged --quiet; then
+            echo "No wiki changes to publish."
+          else
+            git commit -m "Sync wiki from ${REPO}@${{ github.sha }}"
+            git push origin HEAD
+          fi
