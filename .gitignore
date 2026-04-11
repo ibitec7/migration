@@ -12,6 +12,9 @@ wheels/
 # GitHub Wiki export (generated; do not commit)
 wiki_export/
 
+# Local clone of the wiki Git repo (separate from this project; never commit)
+migration.wiki/
+
 # Folders
 logs/*
 data/raw/*
